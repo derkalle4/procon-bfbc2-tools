@@ -1,0 +1,19 @@
+# !kill player
+On Say;Admin;Text !kill;TargetPlayer
+    Say Player %t% killed
+    TargetAction Kill 100
+
+# !kick player
+On Say;Admin;Text !kick;TargetPlayer
+    Say Player %t% kicked;
+    TargetAction Kick kicked by admin
+
+# !tban player for 300 seconds
+On Say;Admin;Text !tban;TargetPlayer
+    Say Player %t% temporary banned (300 seconds)
+    TargetAction TempBan 300 temporary banned by admin
+
+# !ban player
+On Say;Admin;Text !ban;TargetPlayer
+    Say Player %t% banned
+    TargetAction Ban banned by admin

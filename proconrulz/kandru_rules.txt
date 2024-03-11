@@ -1,0 +1,8 @@
+#####################################################
+#  Server !rules messages
+#####################################################
+
+On Say;Text !rules
+    PlayerSay === No Cheating ===
+    PlayerSay === Be nice to others ===
+    PlayerSay === Teamwork is everything - go for the objective ===

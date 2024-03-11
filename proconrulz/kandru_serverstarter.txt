@@ -1,0 +1,17 @@
+## from https://docs.google.com/document/d/1tP-FrZWYb5sY_9kRcP6ihplSk2nXKCOfxF21lrXFrTo/edit
+## FEW PLAYERS ANNOUNCER & REWARDER
+ 
+# Saves the Player in a var %ini_vars_serverstarter_%p%%
+On Join;Not Admin;If %ts1% + %ts2% < 5; Incr %ini_vars_serverstarter_%p%%
+# Announces a "thank you", if 4 or less players are on the server
+On Spawn;PlayerOnce;If %ts1% + %ts2% < 5
+    PlayerSay %p%, thank you for starting the first round!
+    PlayerSay If you are able to start the first round successfully a few times, you will be rewarded with a Premium Slot!
+    PlayerYell If you are able to start the first round successfully a few times, you will be rewarded with a Premium-Slot!
+
+# Rewards a player, if he started the server for a specific number of times
+On Spawn;PlayerOnce
+If %ini_vars_serverstarter_%p%% == 20;if %ini_premiumslots_%p%% >= 0;Exec reservedSlotsList.add %p%;Set %ini_premiumslots_%p%% %ini_premiumslot_day% + 30;Exec reservedSlotsList.save;Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (20 times) - Date: %ymd%;PlayerSay Thank you %p%! This is your 20th time helping to get the server running! You've earned another Premium-Slot for one month from now on!; PlayerYell Thank you %p%! This is your 20h time helping to get the server running! You earned another Premium-Slot for one month!
+If %ini_vars_serverstarter_%p%% == 15;if %ini_premiumslots_%p%% >= 0;Exec reservedSlotsList.add %p%;Set %ini_premiumslots_%p%% %ini_premiumslot_day% + 30;Exec reservedSlotsList.save;Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (15 times) - Date: %ymd%;PlayerSay Thank you %p%! This is your 15th time helping to get the server running! You've earned a Premium-Slot for one month from now on!; PlayerYell Thank you %p%! This is your 15th time helping to get the server running! You earned a Premium-Slot for one month! :)
+If %ini_vars_serverstarter_%p%% == 10;if %ini_premiumslots_%p%% >= 0;Exec reservedSlotsList.add %p%;Set %ini_premiumslots_%p%% %ini_premiumslot_day% + 14;Exec reservedSlotsList.save;Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (10 times) - Date: %ymd%;PlayerSay Thank you %p%! This is your 10th time helping to get the server running! You've earned a Premium-Slot for 2 weeks from now on!; PlayerYell Thank you %p%! This is your 10th time helping to get the server running! You earned a Premium-Slot for 2 weeks! :)
+If %ini_vars_serverstarter_%p%% == 5;if %ini_premiumslots_%p%% >= 0;Exec reservedSlotsList.add %p%;Set %ini_premiumslots_%p%% %ini_premiumslot_day% + 7;Exec reservedSlotsList.save;Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (5 times) - Date: %ymd%;PlayerSay Thank you %p%! This is your 5th time helping to get the server running! You've earned a Premium-Slot for one week!; PlayerYell Thank you %p%! This is your 5th time helping to get the server running! You earned a Premium-Slot for one week! :)

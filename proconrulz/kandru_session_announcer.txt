@@ -1,0 +1,39 @@
+# when a player joins or leaves
+On Join;Say %p% joined us...
+On Leave;Say %p% left us...
+
+## from https://docs.google.com/document/d/1tP-FrZWYb5sY_9kRcP6ihplSk2nXKCOfxF21lrXFrTo/edit
+##JOIN COUNTER / VISIT RESPONDER / WELCOME MESSAGE
+# Accumulate the number of joins in a var %ini_vars_session_joins_%p%%
+On Join;Incr %ini_vars_session_joins_%p%%
+
+# Shows visits of a player if !visits [playername] is typed in chat
+On Say; Text !visits;TargetPlayer
+    If %ini_vars_session_joins_%p%% > 3;PlayerSay This is %t%s %ini_vars_session_joins_%t%%th visit!
+    If %ini_vars_session_joins_%p%% == 3;PlayerSay This is %t%s third visit!
+    If %ini_vars_session_joins_%p%% == 2;PlayerSay This is %t%s second visit!
+    If %ini_vars_session_joins_%p%% == 1;PlayerSay This is %t%s first visit! :)
+
+# Shows own visit counter if only !visits is typed in chat
+On Say; Text !visits;If %text% == !visits
+    If %ini_vars_session_joins_%p%% > 3;PlayerSay This is your %ini_vars_session_joins_%p%%th visit <3
+    If %ini_vars_session_joins_%p%% == 3;PlayerSay This is your third visit <3
+    If %ini_vars_session_joins_%p%% == 2;PlayerSay This is your second visit <3
+    If %ini_vars_session_joins_%p%% == 1;PlayerSay This is your first visit! :)
+
+# Respond with number of joins in correct language when a player spawns for the first time
+On Spawn;PlayerOnce
+    If %ini_vars_session_joins_%p%% > 3;PlayerYell Welcome back %p%, this is your %ini_vars_session_joins_%p%%th visit!
+    If %ini_vars_session_joins_%p%% == 3;PlayerYell Welcome back %p%, this is your third visit!
+    If %ini_vars_session_joins_%p%% == 2;PlayerYell Welcome back %p%, this is your second visit!
+    If %ini_vars_session_joins_%p%% == 1;PlayerYell Welcome %p%, play fair and have fun!
+
+## from https://docs.google.com/document/d/1tP-FrZWYb5sY_9kRcP6ihplSk2nXKCOfxF21lrXFrTo/edit
+## PREMIUM SLOT PLAYER ANNOUNCER
+# add players to vip list
+On Spawn;Not Admin;Protected;ServerFirst;Set %server_vip% %p%;End
+On Spawn;Not Admin;Protected;PlayerFirst;Set %server_vip% %p%,%server_vip%
+# !vip
+On Say;Text !vip;Say VIP-Members online: %server_vip%
+On Say;Text !vip;If %server_vip% == 0
+    PlayerSay No Premium-Slot-Members are currently in-game.
