@@ -23,10 +23,10 @@ On Say; Text !visits;If %text% == !visits
 
 # Respond with number of joins in correct language when a player spawns for the first time
 On Spawn;PlayerOnce
-    If %ini_vars_session_joins_%p%% > 3;PlayerYell Welcome back %p%, this is your %ini_vars_session_joins_%p%%th visit!
-    If %ini_vars_session_joins_%p%% == 3;PlayerYell Welcome back %p%, this is your third visit!
-    If %ini_vars_session_joins_%p%% == 2;PlayerYell Welcome back %p%, this is your second visit!
-    If %ini_vars_session_joins_%p%% == 1;PlayerYell Welcome %p%, play fair and have fun!
+    If %ini_vars_session_joins_%p%% > 3;PlayerSay This is your %ini_vars_session_joins_%p%%th visit!
+    If %ini_vars_session_joins_%p%% == 3;PlayerSay This is your third visit!
+    If %ini_vars_session_joins_%p%% == 2;PlayerSay This is your second visit!
+    If %ini_vars_session_joins_%p%% == 1;PlayerSay Play fair and have fun!
 
 ## from https://docs.google.com/document/d/1tP-FrZWYb5sY_9kRcP6ihplSk2nXKCOfxF21lrXFrTo/edit
 ## PREMIUM SLOT PLAYER ANNOUNCER
