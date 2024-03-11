@@ -1,6 +1,6 @@
 # when a player joins or leaves
-On Join;Say %p% joined us...
-On Leave;Say %p% left us...
+On Join;Say %p% joined us :)
+On Leave;Say %p% left us :/
 
 ## from https://docs.google.com/document/d/1tP-FrZWYb5sY_9kRcP6ihplSk2nXKCOfxF21lrXFrTo/edit
 ##JOIN COUNTER / VISIT RESPONDER / WELCOME MESSAGE
