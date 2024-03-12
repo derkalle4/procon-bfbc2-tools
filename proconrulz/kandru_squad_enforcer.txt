@@ -5,6 +5,12 @@
 ##
 ## Important: change map after enabling to ensure plugin works correctly
 #######################################
+## Variables
+#######################################
+## server_squadenforcer_players -> list of all players with their last squad ID
+## server_squadenforcer_squads[1] -> list of all "players" and "scores" for team 1 with all squads [1]...[8]
+## server_squadenforcer_squads[2] -> list of all "players" and "scores" for team 2 with all squads [1]...[8]
+#######################################
 
 # init squad enforcer
 On Init
