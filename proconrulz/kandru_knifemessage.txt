@@ -12,7 +12,7 @@ On Say;Text !knife?
     
 On Say;Text !knife;log !knife;Set %ini_knife_message[%p%]% %targettext%;PlayerSay %p% your knife message is set
 
-On Kill;Weapon Melee;If %ini_knife_message[%p%]% != 0
+On Kill;Weapon knv-1;If %ini_knife_message[%p%]% != 0
     VictimSay Message from %p%: %ini_knife_message[%p%]%
     PlayerSay You told %v%: %ini_knife_message[%p%]%
     

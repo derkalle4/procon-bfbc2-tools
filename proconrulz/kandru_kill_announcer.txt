@@ -1,9 +1,8 @@
 # Melee Kills Announcer
-On Kill;Weapon Weapons/Knife/Knife;Say %p% slit the throat of %v%
-On Kill;Weapon Melee;Say %p% grabbed and stabbed %v%
+On Kill;Weapon knv-1;Say %p% grabbed and stabbed %v%
 On Kill;If %wk% contains Defib;Say %p% zapped %v% with the Defib
 On Kill;If %wk% contains Repair;Say %p% killed %v% with the Repair Tool
 # FIRSTBLOOD
 On Kill;ServerFirst;Say %pt% %p% has FIRST BLOOD by killing %v% with %w%
 # range kill
-On Kill;%h%;Range 150;Say %p% just killed %v% over more than %r% meters!
+On Kill;%h%;Range 100;Say %p% just killed %v% over more than %r% meters!
