@@ -3,6 +3,7 @@
 #####################################################
 
 On Say;Text !rules
-    PlayerSay === No Cheating ===
-    PlayerSay === Be nice to others ===
+    PlayerSay === Play Fair! Have Fun! ===
+	PlayerSay === Cheats are not allowed! ===
     PlayerSay === Teamwork is everything - go for the objective ===
+	PlayerSay === Visit Discord -> battlefield.onl ===
