@@ -1,0 +1,164 @@
+ProconRulz Quick Reference & Essentials (AI-Optimized)
+=====================================================
+
+About ProconRulz
+----------------
+ProconRulz is a meta-plugin for Procon (Battlefield BC2/BF3) that allows admins to define flexible server rules using a simple scripting language. Rules react to game events (triggers), check conditions, and execute actions.
+
+Rule Syntax
+-----------
+A rule is structured as:
+On <Trigger>; <Condition(s)>; <Action(s)>
+
+- Triggers: On Round, On Spawn, On Kill, On TeamKill, On Suicide, On Join, On Leave, On Say
+- Conditions: Weapon <key>, Damage <key>, Kit <kit>, Map <name>, MapMode <mode>, PlayerCount <N>, Admin, Text <string>, TargetPlayer [<name>], If <var> <compare> <value>, etc.
+- Actions: Say <msg>, Yell <msg>, Kill [delay], Kick <msg>, Ban <msg>, TempBan <seconds> <msg>, TargetAction <action>, Exec <rcon command>, Set/Incr/Decr <var>, Log <msg>
+
+Variables
+---------
+- Substitution variables: %p% (player), %v% (victim), %w% (weapon), %d% (damage), %c% (player rule count), %tc% (team rule count), %sc% (server rule count), %t% (target player), %text%, %targettext%, %team_score%, etc.
+- Rulz variables: Custom, e.g. %kills%, %server_kills%, %team_kills%, can be indexed: %server_tked[%p%]%
+- Persistent variables: %ini_<section>_<var>% (stored in INI file, not reset per round)
+
+Multi-line Rules
+----------------
+- Omit trigger to inherit from above (trigger propagation).
+- Use `+` at line start to continue previous rule (lines joined into one rule).
+- Example:
+  On Kill; Damage SniperRifle
+  PlayerCount 3; Kick
+  PlayerCount 1; Kill
+  Say No snipers on this server, %p% !!
+  (Equivalent to four rules with On Kill; Damage SniperRifle...)
+
+TargetPlayer/TargetAction
+-------------------------
+- TargetPlayer [<name>] sets %t% for use in TargetAction <action>.
+- TargetAction <action> applies the action to %t% instead of %p%.
+- If TargetPlayer is used without a string, it will search %text% (from On Say) for a player name after any Text condition.
+- TargetPlayer only succeeds if it matches a single player.
+- %targettext% is updated after Text and TargetPlayer conditions to contain the remaining text.
+- Example:
+  On Say;Admin;Text !kick;TargetPlayer;TargetAction Kick %targettext%
+  (Splits "!kick bam too much whining" into %t% = "bam", %targettext% = "too much whining")
+
+Arithmetic & Rounding
+---------------------
+- Use +, -, *, / in Set and If (no parentheses).
+- Example: Set %x% %y% + %z%
+- Use %var.3% for 3 decimal places (e.g. Set %x.3% 1.4567;Say %x.3% outputs "1.457").
+
+Triggers, Conditions, and Actions (Summary & Details)
+-----------------------------------------------------
+**Triggers**
+- On Round: %m% (map), %mm% (mode)
+- On Spawn: %p% (player), %pt% (team), %k% (kit), %w% (weapon), %spec% (specializations)
+- On Kill: %p% (killer), %v% (victim), %w% (weapon), %d% (damage)
+- On TeamKill: as above
+- On Suicide: %p%, %w%
+- On Join/Leave: %p%
+- On Say: %p%, %text%
+
+**Conditions** (prefix with "Not " to reverse)
+- Admin, Admins, Protected
+- Team <string>, Teamsize <N>
+- Map <string>, MapMode <string>
+- Headshot, Kit <kit> [<N>], Weapon <weapon> [<N>], Damage <damage> [<N>], Spec <specialization> [<N>]
+- TeamKit/TeamWeapon/TeamDamage/TeamSpec <key> <N>
+- Range <N>
+- PlayerCount/Count <N>, TeamCount <N>, ServerCount <N>
+- Rate <N> <M>, PlayerFirst, TeamFirst, ServerFirst, PlayerOnce
+- Text <key>, TargetPlayer [<name>], Ping <N>
+- Set/Incr/Decr/If <%varname%> <compare> <value>
+
+**Actions**
+- Say, PlayerSay, SquadSay, TeamSay, VictimSay, AdminSay
+- Yell, PlayerYell, SquadYell, TeamYell
+- Log, Both, All
+- Kill [<N>], Kick, Ban, TempBan <N>, PBKick [<N>], PBBan
+- TargetAction <action>, Exec <command>
+
+Substitution Variables (Appendix 1)
+-----------------------------------
+%p%: Player name (On Spawn, or killer on a kill)
+%pt%: Player team name
+%ps%: Player Squad
+%v%: Victim name (On Kill|TeamKill|Suicide)
+%vt%: Victim team name
+%k%: Player kit on spawn
+%w%: Weapon (On Kill)
+%d%: Damage (On Kill)
+%spec%: Specializations (On Spawn)
+%r%: Range (On Kill)
+%n%: Teamsize of current smallest team
+%pts%: Teamsize of team of current player
+%c%: Count of times this player has triggered this rule
+%tc%: Team count
+%sc%: Server count
+%h%: Headshot (On Kill)
+%m%: Map name
+%mm%: Map mode
+%t%: Target playername from TargetPlayer
+%targettext%: Text after Text/TargetPlayer condition
+%ping%: Player ping
+%text%: Text from player On Say event
+%pb_guid%: PunkBuster player GUID
+%ea_guid%: EA player GUID
+%ip%: IP address of current player
+%pcountry%: Player country
+%vcountry%: Victim country
+%score%: Player score
+%team_score%: Team tickets
+%hms%: Current time (hh:mm:ss)
+%ymd%: Date (yyyy_mm_dd)
+%seconds%: Seconds since Jan 1st 2012
+
+Variable Types & Advanced Usage
+-------------------------------
+- Rulz variables can be per-player (default), per-team (%team_varname%), per-squad (%squad_varname%), or per-server (%server_varname%).
+- Indexed variables: %server_tked[%p%]% stores a value for each player, e.g. last victim.
+- Multiple indexes allowed: %server_kills[%w%][%p%]%
+- Persistent variables: %ini_<section>_<var>% are stored in an INI file and not reset per round.
+- To reset persistent variables: Set %ini% 0 (all), Set %ini_section% 0 (section), Set %ini_section_var% 0 (variable).
+
+Weapons, Kits, Damage, Specializations (Appendix 2)
+---------------------------------------------------
+**Kits:** None, Assault, Engineer, Demolition, Support, Recon
+
+**Weapons:** (partial list, see plugin for full)
+- 870MCS, AEK-971, AKS-74u, AN-94&Abakan, AS&Val, DAO-12, Death, Defib, F2000, FAMAS, FGM-148, FIM92, Glock18, HK53, jackhammer, JNG90, Knife_RazorBlade, L96, LSAT, M416, M417, M1014, M15&AT&Mine, M16A4, M1911, M240, M249, M26Mass, M27IAR, M320, M39, M40A5, M4A1, M60, M67, M9, M93R, Medkit, Melee, MG36, Mk11, Model98B, MP7, Pecheneg, PP-19, PP-2000, QBB-95, QBU-88, QBZ-95, Repair&Tool, RoadKill, RPG-7, RPK-74M, SCAR-L, SG&553&LB, Siaga20k, SKS, SMAW, SPAS-12, SV98, SVD, Steyr&AUG, Taurus&.44, Type88, USAS-12, Weapons/A91/A91, Weapons/AK74M/AK74, Weapons/G36C/G36C, Weapons/G3A3/G3A3, Weapons/Gadgets/C4/C4, Weapons/Gadgets/Claymore/Claymore, Weapons/KH2002/KH2002, Weapons/Knife/Knife, Weapons/MagpulPDR/MagpulPDR, Weapons/MP412Rex/MP412REX, Weapons/MP443/MP443, Weapons/MP443/MP443_GM, Weapons/P90/P90, Weapons/P90/P90_GM, Weapons/Sa18IGLA/Sa18IGLA, Weapons/SCAR-H/SCAR-H, Weapons/UMP45/UMP45, Weapons/XP1_L85A2/L85A2, Weapons/XP2_ACR/ACR, Weapons/XP2_L86/L86, Weapons/XP2_MP5K/MP5K, Weapons/XP2_MTAR/MTAR
+
+**Damage:** None, Nonlethal, Impact, Melee, Handgun, AssaultRifle, LMG, SMG, SniperRifle, Shotgun, Explosive, ProjectileExplosive, VehicleWater, VehicleAir, VehicleStationary, VehicleLight, VehicleHeavy
+
+**Specializations:** (Not available in BF3)
+
+Maps & Modes (Appendix 3 & 4)
+-----------------------------
+**Maps:** MP_001 (Grand Bazaar), MP_003 (Teheran Highway), MP_007 (Caspian Border), MP_011 (Seine Crossing), MP_012 (Operation Firestorm), MP_013 (Damavand Peak), MP_017 (Noshahr Canals), MP_018 (Kharg Island), MP_Subway (Operation Metro), XP1_001 (Strike at Karkand), XP1_002 (Gulf of Oman), XP1_003 (Sharqi Peninsula), XP1_004 (Wake Island)
+
+**Map Modes:** ConquestLarge0 (Conquest64), ConquestSmall0 (Conquest), ConquestSmall1 (Conquest), RushLarge0 (Rush), SquadRush0 (Squad Rush), SquadDeathMatch0 (Squad Deathmatch), TeamDeathMatch0 (Team Deathmatch)
+
+Sample In-Game Admin Plugin (Appendix 5)
+----------------------------------------
+On Say;Text !slay;Admin;TargetPlayer;PlayerSay %t% SLAYED;TargetAction Kill 100
+On Say;Text !kick;Admin;TargetPlayer;PlayerSay %t% KICKED;TargetAction Kick %targettext%
+On Say;Text !ban;Admin;TargetPlayer;PlayerSay %t% BANNED;TargetAction Ban %targettext%
+On Say;Text !nextlevel;Admin;Exec admin.runNextLevel
+On Say;Text !yell;Yell 5 %targettext%
+On Say;Text !pyell;TargetPlayer;PlayerSay (%t%) %targettext%; TargetAction PlayerYell %targettext%
+
+Glossary
+--------
+- Condition: A test applied after a trigger, e.g. Weapon RPG-7.
+- Damage: Type of damage a weapon inflicts, e.g. ProjectileExplosive.
+- Event: A real-time packet from the game server, e.g. a kill.
+- Plugin: Extension for Procon.
+- Procon: Admin utility for Battlefield servers.
+- ProconRulz: Meta-plugin for scripting server rules.
+- rcon: Remote Console interface for game servers.
+- rulz variable: Custom variable for storing values, e.g. %kills%.
+- substitution variable: Built-in variable replaced with game data, e.g. %p%.
+- trigger: Event that causes a rule to be evaluated, e.g. On Kill.
+- Weapon: The tool used to kill/damage, e.g. SMAW.
+
+For full lists of weapons, kits, and more, see the ProconRulz plugin ‘Details’ tab.

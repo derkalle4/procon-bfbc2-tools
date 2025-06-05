@@ -1,0 +1,146 @@
+#######################################
+## SQUAD ENFORCER (Optimized for BFBC2)
+## - SQDM: balance players across 4 teams (squads)
+## - Other modes: fill squads in teams, starting from Alpha
+## - Allows squad change if it doesn't unbalance
+## - On plugin reload during round: disables enforcement until next map
+#######################################
+
+# --- Initialization ---
+On Init
+    Say Squad Enforcer initialized. Please change map to activate.
+    Set %enforcer_active% 0
+
+On Round
+    Say Squad Enforcer active.
+    Set %enforcer_active% 1
+    # Reset all squad/player tracking variables
+    Set %server_squadenforcer_players% 0
+    Set %server_squadenforcer_squads[1]% 0
+    Set %server_squadenforcer_squads[2]% 0
+    Set %server_squadenforcer_squads[3]% 0
+    Set %server_squadenforcer_squads[4]% 0
+
+# --- Disable enforcement if plugin is reloaded mid-round ---
+On PluginLoaded
+    If %enforcer_active% == 1
+        Say Squad Enforcer: plugin reloaded during round, enforcement disabled until next map.
+        Set %enforcer_active% 0
+
+# --- Show squads command ---
+On Say;Text !squads,!sl
+    MapMode SQDM
+        PlayerSay SQDM teams: Alpha=%server_squadenforcer_squads[1][1]%, Bravo=%server_squadenforcer_squads[1][2]%, Charlie=%server_squadenforcer_squads[1][3]%, Delta=%server_squadenforcer_squads[1][4]%
+    Not MapMode SQDM
+        PlayerSay Your team squads: Alpha=%server_squadenforcer_squads[%ptk%][1]%, Bravo=%server_squadenforcer_squads[%ptk%][2]%, Charlie=%server_squadenforcer_squads[%ptk%][3]%, Delta=%server_squadenforcer_squads[%ptk%][4]%
+
+# --- Main enforcement on spawn ---
+On Spawn
+    If %enforcer_active% == 0; End
+
+    # --- SQDM: balance across 4 teams ---
+    MapMode SQDM
+        # Assign new player to smallest team (squad)
+        If %server_squadenforcer_players[%p%]% == 0
+            # Find smallest squad and assign
+            If %server_squadenforcer_squads[1][1]% <= %server_squadenforcer_squads[1][2]% && %server_squadenforcer_squads[1][1]% <= %server_squadenforcer_squads[1][3]% && %server_squadenforcer_squads[1][1]% <= %server_squadenforcer_squads[1][4]%
+                Exec admin.movePlayer %p% 1 1 true
+                Say %p% assigned to Alpha
+                Incr %server_squadenforcer_squads[1][1]%
+                Set %server_squadenforcer_players[%p%]% 1
+                End
+            If %server_squadenforcer_squads[1][2]% < %server_squadenforcer_squads[1][1]% && %server_squadenforcer_squads[1][2]% <= %server_squadenforcer_squads[1][3]% && %server_squadenforcer_squads[1][2]% <= %server_squadenforcer_squads[1][4]%
+                Exec admin.movePlayer %p% 2 1 true
+                Say %p% assigned to Bravo
+                Incr %server_squadenforcer_squads[1][2]%
+                Set %server_squadenforcer_players[%p%]% 2
+                End
+            If %server_squadenforcer_squads[1][3]% < %server_squadenforcer_squads[1][1]% && %server_squadenforcer_squads[1][3]% < %server_squadenforcer_squads[1][2]% && %server_squadenforcer_squads[1][3]% <= %server_squadenforcer_squads[1][4]%
+                Exec admin.movePlayer %p% 3 1 true
+                Say %p% assigned to Charlie
+                Incr %server_squadenforcer_squads[1][3]%
+                Set %server_squadenforcer_players[%p%]% 3
+                End
+            If %server_squadenforcer_squads[1][4]% < %server_squadenforcer_squads[1][1]% && %server_squadenforcer_squads[1][4]% < %server_squadenforcer_squads[1][2]% && %server_squadenforcer_squads[1][4]% < %server_squadenforcer_squads[1][3]%
+                Exec admin.movePlayer %p% 4 1 true
+                Say %p% assigned to Delta
+                Incr %server_squadenforcer_squads[1][4]%
+                Set %server_squadenforcer_players[%p%]% 4
+                End
+        End
+
+        # Allow squad change if new squad is not bigger than old
+        If %ptk% != %server_squadenforcer_players[%p%]%
+            If %server_squadenforcer_squads[1][%ptk%]% < %server_squadenforcer_squads[1][%server_squadenforcer_players[%p%]%]%
+                Decr %server_squadenforcer_squads[1][%server_squadenforcer_players[%p%]%]%
+                Incr %server_squadenforcer_squads[1][%ptk%]%
+                Set %server_squadenforcer_players[%p%]% %ptk%
+                Say %p% changed to new squad
+                End
+            Else
+                Exec admin.movePlayer %p% %server_squadenforcer_players[%p%]% 1 true
+                PlayerSay Squad full, moved back!
+            End
+        End
+    End
+
+    # --- Team-based modes: fill squads in team, starting from Alpha ---
+    Not MapMode SQDM
+        # If player not assigned, assign to smallest squad in team
+        If %server_squadenforcer_players[%p%]["squadID"]% == 0
+            If %server_squadenforcer_squads[%ptk%][1]% <= %server_squadenforcer_squads[%ptk%][2]% && %server_squadenforcer_squads[%ptk%][1]% <= %server_squadenforcer_squads[%ptk%][3]% && %server_squadenforcer_squads[%ptk%][1]% <= %server_squadenforcer_squads[%ptk%][4]%
+                Exec admin.movePlayer %p% %ptk% 1 true
+                TeamSay %p% joined Alpha
+                Incr %server_squadenforcer_squads[%ptk%][1]%
+                Set %server_squadenforcer_players[%p%]["squadID"]% 1
+                Set %server_squadenforcer_players[%p%]["teamID"]% %ptk%
+                End
+            If %server_squadenforcer_squads[%ptk%][2]% < %server_squadenforcer_squads[%ptk%][1]% && %server_squadenforcer_squads[%ptk%][2]% <= %server_squadenforcer_squads[%ptk%][3]% && %server_squadenforcer_squads[%ptk%][2]% <= %server_squadenforcer_squads[%ptk%][4]%
+                Exec admin.movePlayer %p% %ptk% 2 true
+                TeamSay %p% joined Bravo
+                Incr %server_squadenforcer_squads[%ptk%][2]%
+                Set %server_squadenforcer_players[%p%]["squadID"]% 2
+                Set %server_squadenforcer_players[%p%]["teamID"]% %ptk%
+                End
+            If %server_squadenforcer_squads[%ptk%][3]% < %server_squadenforcer_squads[%ptk%][1]% && %server_squadenforcer_squads[%ptk%][3]% < %server_squadenforcer_squads[%ptk%][2]% && %server_squadenforcer_squads[%ptk%][3]% <= %server_squadenforcer_squads[%ptk%][4]%
+                Exec admin.movePlayer %p% %ptk% 3 true
+                TeamSay %p% joined Charlie
+                Incr %server_squadenforcer_squads[%ptk%][3]%
+                Set %server_squadenforcer_players[%p%]["squadID"]% 3
+                Set %server_squadenforcer_players[%p%]["teamID"]% %ptk%
+                End
+            If %server_squadenforcer_squads[%ptk%][4]% < %server_squadenforcer_squads[%ptk%][1]% && %server_squadenforcer_squads[%ptk%][4]% < %server_squadenforcer_squads[%ptk%][2]% && %server_squadenforcer_squads[%ptk%][4]% < %server_squadenforcer_squads[%ptk%][3]%
+                Exec admin.movePlayer %p% %ptk% 4 true
+                TeamSay %p% joined Delta
+                Incr %server_squadenforcer_squads[%ptk%][4]%
+                Set %server_squadenforcer_players[%p%]["squadID"]% 4
+                Set %server_squadenforcer_players[%p%]["teamID"]% %ptk%
+                End
+        End
+
+        # Allow squad change if new squad is not bigger than old
+        If %server_squadenforcer_players[%p%]["squadID"]% != %psk%
+            If %server_squadenforcer_squads[%ptk%][%psk%]% < %server_squadenforcer_squads[%ptk%][%server_squadenforcer_players[%p%]["squadID"]%]%
+                Incr %server_squadenforcer_squads[%ptk%][%psk%]%
+                Decr %server_squadenforcer_squads[%ptk%][%server_squadenforcer_players[%p%]["squadID"]%]%
+                Set %server_squadenforcer_players[%p%]["squadID"]% %psk%
+                TeamSay %p% changed squad
+                End
+            Else
+                Exec admin.movePlayer %p% %ptk% %server_squadenforcer_players[%p%]["squadID"]% true
+                PlayerSay Squad full, moved back!
+            End
+        End
+    End
+
+# --- On player leave: update counters ---
+On Leave
+    MapMode SQDM
+        If %server_squadenforcer_players[%p%]% > 0
+            Decr %server_squadenforcer_squads[1][%server_squadenforcer_players[%p%]%]%
+            Set %server_squadenforcer_players[%p%]% 0
+    Not MapMode SQDM
+        If %server_squadenforcer_players[%p%]["squadID"]% > 0 && %server_squadenforcer_players[%p%]["teamID"]% > 0
+            Decr %server_squadenforcer_squads[%server_squadenforcer_players[%p%]["teamID"]%][%server_squadenforcer_players[%p%]["squadID"]%]%
+            Set %server_squadenforcer_players[%p%]["squadID"]% 0
+            Set %server_squadenforcer_players[%p%]["teamID"]% 0
