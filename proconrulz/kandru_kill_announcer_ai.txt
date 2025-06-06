@@ -1,0 +1,30 @@
+# KILL ANNOUNCER
+
+On Kill;If %wk% contains Knife; Yell %p% stabbed %v% in the back!
+On Kill;If %wk% contains Defib; Yell %p% zapped %v% with the Defibrillator!
+On Kill;If %wk% contains Repair; Yell %p% roasted %v% with the Repair Tool!
+On Kill;If %wk% contains Road; Yell %p% ran over %v% for a roadkill!
+
+On Kill; Headshot; Yell HEADSHOT! %p% domed %v% with %w%!
+
+On Kill; Range 100; Yell %p% sniped %v% from over %r% meters away!
+On Kill; Range 200; Yell %p% made an EPIC shot! %v% was killed from %r% meters!
+
+On Kill; PlayerOnce; If %c% == 2; Yell DOUBLE KILL! %p% is on a roll!
+On Kill; PlayerOnce; If %c% == 3; Yell TRIPLE KILL! %p% is unstoppable!
+On Kill; PlayerOnce; If %c% == 4; Yell QUADRA KILL! %p% is a machine!
+On Kill; PlayerOnce; If %c% == 5; Yell PENTA KILL! %p% is a legend!
+
+On Kill; ServerFirst; Yell %pt% %p% drew FIRST BLOOD by killing %v% with %w%!
+
+On Kill; Set %server_lastkiller[%v%]% %p%
+On Kill; If %v% == %server_lastkiller[%p%]%; Yell %p% got REVENGE on %v%!
+
+On Kill; If %ini_killstreak_%p%% == 0; Set %ini_killstreak_%p%% 1
+On Kill; If %ini_killstreak_%p%% > 0; Incr %ini_killstreak_%p%%
+On Kill; Set %ini_killstreak_%p%% 0 %v%
+On Suicide; Set %ini_killstreak_%p%% 0
+On TeamKill; Set %ini_killstreak_%p%% 0
+On Kill; If %ini_killstreak_%p%% == 5; Yell %p% is on a 5 KILLSTREAK!
+On Kill; If %ini_killstreak_%p%% == 10; Yell %p% is UNSTOPPABLE! 10 KILLSTREAK!
+On Kill; If %ini_killstreak_%p%% == 15; Yell %p% is GODLIKE! 15 KILLSTREAK!

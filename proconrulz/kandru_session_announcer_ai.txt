@@ -1,58 +1,38 @@
-# --- Player Join/Leave Announcements ---
 On Join;Say %p% joined us :)
 On Leave;Say %p% left us :/
-
-# --- Admin Join Announcement ---
 On Join;Admin;Say Admin %p% has joined the server!
-
-# --- Session Join Counter (Persistent) ---
 On Join;Incr %ini_vars_session_joins_%p%%
 
-# --- Welcome Message on First Spawn ---
-On Spawn;PlayerOnce
-    If %ini_vars_session_joins_%p%% == 1;PlayerSay Welcome %p%! Play fair and have fun!
-    If %ini_vars_session_joins_%p%% == 2;PlayerSay Welcome back %p%! This is your second visit!
-    If %ini_vars_session_joins_%p%% == 3;PlayerSay Welcome back %p%! This is your third visit!
-    If %ini_vars_session_joins_%p%% > 3;PlayerSay Welcome back %p%! This is your %ini_vars_session_joins_%p%%th visit!
+On Spawn;PlayerOnce;If %ini_vars_session_joins_%p%% == 1;PlayerSay Welcome %p%! Play fair and have fun!
+On Spawn;PlayerOnce;If %ini_vars_session_joins_%p%% == 2;PlayerSay Welcome back %p%! This is your second visit!
+On Spawn;PlayerOnce;If %ini_vars_session_joins_%p%% == 3;PlayerSay Welcome back %p%! This is your third visit!
+On Spawn;PlayerOnce;If %ini_vars_session_joins_%p%% > 3;PlayerSay Welcome back %p%! This is your %ini_vars_session_joins_%p%%th visit!
 
-# --- !visits Command (Own and Others) ---
-On Say;Text !visits;If %text% == !visits
-    If %ini_vars_session_joins_%p%% == 1;PlayerSay This is your first visit! :)
-    If %ini_vars_session_joins_%p%% == 2;PlayerSay This is your second visit! <3
-    If %ini_vars_session_joins_%p%% == 3;PlayerSay This is your third visit! <3
-    If %ini_vars_session_joins_%p%% > 3;PlayerSay This is your %ini_vars_session_joins_%p%%th visit! <3
+On Say;Text !visits;If %text% == !visits;If %ini_vars_session_joins_%p%% == 1;PlayerSay This is your first visit! :)
+On Say;Text !visits;If %text% == !visits;If %ini_vars_session_joins_%p%% == 2;PlayerSay This is your second visit! <3
+On Say;Text !visits;If %text% == !visits;If %ini_vars_session_joins_%p%% == 3;PlayerSay This is your third visit! <3
+On Say;Text !visits;If %text% == !visits;If %ini_vars_session_joins_%p%% > 3;PlayerSay This is your %ini_vars_session_joins_%p%%th visit! <3
 
-On Say;Text !visits;TargetPlayer
-    If %ini_vars_session_joins_%t%% == 1;PlayerSay %t% is on their first visit! :)
-    If %ini_vars_session_joins_%t%% == 2;PlayerSay %t% is on their second visit!
-    If %ini_vars_session_joins_%t%% == 3;PlayerSay %t% is on their third visit!
-    If %ini_vars_session_joins_%t%% > 3;PlayerSay %t% is on their %ini_vars_session_joins_%t%%th visit!
+On Say;Text !visits;TargetPlayer;If %ini_vars_session_joins_%t%% == 1;PlayerSay %t% is on their first visit! :)
+On Say;Text !visits;TargetPlayer;If %ini_vars_session_joins_%t%% == 2;PlayerSay %t% is on their second visit!
+On Say;Text !visits;TargetPlayer;If %ini_vars_session_joins_%t%% == 3;PlayerSay %t% is on their third visit!
+On Say;Text !visits;TargetPlayer;If %ini_vars_session_joins_%t%% > 3;PlayerSay %t% is on their %ini_vars_session_joins_%t%%th visit!
 
-# --- Premium Slot Player Announcer ---
 On Spawn;Not Admin;Protected;ServerFirst;Set %server_vip% %p%;End
 On Spawn;Not Admin;Protected;PlayerFirst;Set %server_vip% %p%,%server_vip%
 On Say;Text !vip;If %server_vip% == 0;PlayerSay No Premium-Slot-Members are currently in-game.
 On Say;Text !vip;If %server_vip% != 0;Say VIP-Members online: %server_vip%
 
-# --- Killstreak Announcer ---
 On Kill;Incr %kills%
-On Death;Incr %deaths%
+On Kill;Set %deaths% %deaths% + 1 %v%
 On Kill;If %kills% == 5;Say %p% is on a 5 killstreak!
 On Kill;If %kills% == 10;Say %p% is UNSTOPPABLE with 10 kills in a row!
-On Death;Set %kills% 0
+On Kill;Set %kills% 0 %v%
 
-# --- !stats Command (Kills, Deaths, K/D) ---
-On Say;Text !stats;If %text% == !stats
-    If %deaths% != 0;Set %kd% %kills%/%deaths%
-    If %deaths% == 0;Set %kd% %kills%
-    PlayerSay Stats for %p%: Kills: %kills%, Deaths: %deaths%, K/D: %kd%
+On Say;Text !stats;If %text% == !stats;If %deaths% != 0;Set %kd% %kills%/%deaths%;PlayerSay Stats for %p%: Kills: %kills%, Deaths: %deaths%, K/D: %kd%
+On Say;Text !stats;If %text% == !stats;If %deaths% == 0;Set %kd% %kills%;PlayerSay Stats for %p%: Kills: %kills%, Deaths: %deaths%, K/D: %kd%
 
-# --- !help Command ---
-On Say;Text !help;If %text% == !help
-    PlayerSay Commands: !visits, !stats, !vip, !help
+On Say;Text !help;If %text% == !help;PlayerSay Commands: !visits, !stats, !vip, !help
 
-# --- Simple Anti-Chat-Spam ---
 On Say;Rate 5 10;PlayerSay %p%, please do not spam the chat!
 On Say;Rate 10 30;Kick Spamming chat
-
-# --- End of Script ---

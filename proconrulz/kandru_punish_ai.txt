@@ -1,99 +1,17 @@
-#####################################################
-##### BEST 3 PLAYERS ##### Optimized & Enhanced
-# Tracks top 3 players by kills.
-# Reports after top player 10 kills, on leader change,
-# when a new player enters/leaves top 3, and every 70 kills.
-# Resets at round start.
-#####################################################
+#########################################################
+# Teamkill Punisher v1.2 (AI-Optimized)
+# Original Author ty_ger07, tweak by bambam
+# Enhancements by russel5, AI improvements by GitHub Copilot
+#########################################################
 
-# Reset all variables at round start
-On Round;
-    Set %server_m_player[1]% "";
-    Set %server_m_player[2]% "";
-    Set %server_m_player[3]% "";
-    Set %server_m_kills[1]% 0;
-    Set %server_m_kills[2]% 0;
-    Set %server_m_kills[3]% 0;
-    Set %last_top1% "";
-    Set %last_top2% "";
-    Set %last_top3% "";
-    Set %server_m_report% 0;
-    Set %server_m_report_reason% "";
-    Set %server_m_killcount% 0;
-
-# Increment player kill count
-On Kill;
-    Incr %m_kills%;
-
-# Main logic for updating top 3
-On Kill;
-    # Update kills if player is already in top 3
-    If %p% == %server_m_player[1]%; Set %server_m_kills[1]% %m_kills%;
-    If %p% == %server_m_player[2]%; Set %server_m_kills[2]% %m_kills%;
-    If %p% == %server_m_player[3]%; Set %server_m_kills[3]% %m_kills%;
-
-    # Insert or reorder player in top 3 if needed
-    If %m_kills% > %server_m_kills[1]%;
-        If %p% != %server_m_player[1]%;
-            # Shift down 1st and 2nd
-            If %p% != %server_m_player[2]%;
-                Set %server_m_player[3]% %server_m_player[2]%;
-                Set %server_m_kills[3]% %server_m_kills[2]%;
-                Set %server_m_player[2]% %server_m_player[1]%;
-                Set %server_m_kills[2]% %server_m_kills[1]%;
-            Set %server_m_report% 1;
-            Set %server_m_report_reason% "New #1";
-        Set %server_m_player[1]% %p%;
-        Set %server_m_kills[1]% %m_kills%;
-
-    ElseIf %m_kills% > %server_m_kills[2]%;
-        If %p% != %server_m_player[2]%;
-            If %p% != %server_m_player[1]%;
-                Set %server_m_player[3]% %server_m_player[2]%;
-                Set %server_m_kills[3]% %server_m_kills[2]%;
-            Set %server_m_report% 1;
-            Set %server_m_report_reason% "New #2";
-        Set %server_m_player[2]% %p%;
-        Set %server_m_kills[2]% %m_kills%;
-
-    ElseIf %m_kills% > %server_m_kills[3]%;
-        If %p% != %server_m_player[3]%;
-            If %p% != %server_m_player[1]% && %p% != %server_m_player[2]%;
-                Set %server_m_report% 1;
-                Set %server_m_report_reason% "New #3";
-            Set %server_m_player[3]% %p%;
-            Set %server_m_kills[3]% %m_kills%;
-
-    # Prevent duplicate names in top 3
-    If %server_m_player[1]% == %server_m_player[2]%; Set %server_m_player[2]% "";
-    If %server_m_player[1]% == %server_m_player[3]%; Set %server_m_player[3]% "";
-    If %server_m_player[2]% == %server_m_player[3]%; Set %server_m_player[3]% "";
-
-    # Announce if someone leaves top 3 (only if changed)
-    If %server_m_player[1]% != %last_top1%;
-        If %last_top1% != ""; Set %server_m_report% 1; Set %server_m_report_reason% "%last_top1% left #1";
-    Set %last_top1% %server_m_player[1]%;
-
-    If %server_m_player[2]% != %last_top2%;
-        If %last_top2% != ""; Set %server_m_report% 1; Set %server_m_report_reason% "%last_top2% left #2";
-    Set %last_top2% %server_m_player[2]%;
-
-    If %server_m_player[3]% != %last_top3%;
-        If %last_top3% != ""; Set %server_m_report% 1; Set %server_m_report_reason% "%last_top3% left #3";
-    Set %last_top3% %server_m_player[3]%;
-
-# Periodic report every 70 kills
-On Kill;
-    Incr %server_m_killcount%;
-    If %server_m_killcount% >= 70;
-        Set %server_m_report% 1;
-        Set %server_m_report_reason% "------";
-
-# Output report if needed
-On Kill;
-    If %server_m_report% == 1;
-        Say ----%server_m_report_reason%-------- Most kills by -----------------
-        Say [1st] %server_m_player[1]% %server_m_kills[1]%, [2nd] %server_m_player[2]% %server_m_kills[2]%, [3rd] %server_m_player[3]% %server_m_kills[3]%
-        Say Kill gap: [%server_m_kills[1]% - %server_m_kills[2]%] between 1st and 2nd
-        Set %server_m_report% 0;
-        Set %server_m_killcount% 0;
+On Spawn; ServerFirst; Set %ini_punish% 0
+On TeamKill; PlayerYell %p% you TEAMKILLED %v%. Watch your fire!
+On TeamKill; PlayerSay %p% you TEAMKILLED %v%. This is your %c% victim.
+On TeamKill; VictimSay %v%: !p or !f
+On TeamKill; Set %server_lastteamkill[%p%]% %v%
+On TeamKill; Set %server_lastteamkiller[%v%]% %p%
+On Say; Text !p,!punish; If %server_lastteamkiller[%p%]% == 0; PlayerSay %p%: could not find a recent team kill to punish.
+On Say; Text !p,!punish; If %server_lastteamkiller[%p%]% != 0; Incr %ini_punish_count[%server_lastteamkiller[%p%]%]%; PlayerSay %server_lastteamkiller[%p%]% has been punished for teamkilling you, %p%.; If %ini_punish_count[%server_lastteamkiller[%p%]%] == 4; TempBan 7200 %server_lastteamkiller[%p%]% TempBan 2 hours; Set %ini_punish_count[%server_lastteamkiller[%p%]%] 0; TargetPlayer %server_lastteamkiller[%p%]%; TargetAction PlayerSay %t% killed for team killing.; TargetAction Kill; TargetConfirm; Set %server_lastteamkiller[%p%]% 0
+On Say; Text !f,!forgive; If %server_lastteamkiller[%p%]% == 0; PlayerSay %p%: could not find a recent team kill to forgive.
+On Say; Text !f,!forgive; If %server_lastteamkiller[%p%]% != 0; TargetPlayer %server_lastteamkiller[%p%]%; Set %server_lastteamkill[%server_lastteamkiller[%p%]%]% 0; TargetAction PlayerSay %t% was forgiven by %p%.; Set %server_lastteamkiller[%p%]% 0
+On Leave; Set %ini_punish_count[%p%]% 0

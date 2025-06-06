@@ -5,73 +5,18 @@ Set %serverstarter_threshold_1% 5
 Set %serverstarter_threshold_2% 10
 Set %serverstarter_threshold_3% 15
 Set %serverstarter_threshold_4% 20
-
-Set %serverstarter_duration_1% 7      // days
+Set %serverstarter_duration_1% 7
 Set %serverstarter_duration_2% 14
 Set %serverstarter_duration_3% 30
 Set %serverstarter_duration_4% 30
 
-# --- TRACK PLAYER STARTS ---
 On Join; Not Admin; If %ts1% + %ts2% < 5; Incr %ini_vars_serverstarter_%p%%
+On Join; Set %ini_vars_serverstarter_lastjoin_%p%% %seconds%
+On Join; If %ini_vars_serverstarter_lastjoin_%p%% + 2592000 < %seconds%; Set %ini_vars_serverstarter_%p%% 0; PlayerSay %p%, your server starter progress was reset due to 30 days inactivity.
 
-# --- THANK YOU ANNOUNCEMENT (with cooldown) ---
-On Spawn; PlayerOnce; If %ts1% + %ts2% < 5
-    If %ini_vars_serverstarter_lastmsg_%p%% + 300 < %seconds%
-        PlayerSay %p%, thank you for starting the first round!
-        PlayerSay If you are able to start the first round successfully a few times, you will be rewarded with a Premium Slot!
-        PlayerYell If you are able to start the first round successfully a few times, you will be rewarded with a Premium-Slot!
-        Set %ini_vars_serverstarter_lastmsg_%p%% %seconds%
-
-# --- REWARD LOGIC (optimized, highest threshold first) ---
-On Spawn; PlayerOnce
-    If %ini_vars_serverstarter_%p%% == %serverstarter_threshold_4%
-        If %ini_premiumslots_%p%% >= 0
-            Exec reservedSlotsList.add %p%
-            Set %ini_premiumslots_%p%% %ini_premiumslot_day% + %serverstarter_duration_4%
-            Exec reservedSlotsList.save
-            Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (%serverstarter_threshold_4% times) - Date: %ymd%
-            PlayerSay Thank you %p%! This is your %serverstarter_threshold_4%th time helping to get the server running! You've earned another Premium-Slot for one month!
-            PlayerYell Thank you %p%! This is your %serverstarter_threshold_4%th time helping to get the server running! You earned another Premium-Slot for one month!
-            AdminSay [ServerStarter] %p% has been rewarded a premium slot for %serverstarter_duration_4% days (threshold %serverstarter_threshold_4%)
-            Log [ServerStarter] %p% reached %serverstarter_threshold_4% starts and was rewarded.
-    ElseIf %ini_vars_serverstarter_%p%% == %serverstarter_threshold_3%
-        If %ini_premiumslots_%p%% >= 0
-            Exec reservedSlotsList.add %p%
-            Set %ini_premiumslots_%p%% %ini_premiumslot_day% + %serverstarter_duration_3%
-            Exec reservedSlotsList.save
-            Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (%serverstarter_threshold_3% times) - Date: %ymd%
-            PlayerSay Thank you %p%! This is your %serverstarter_threshold_3%th time helping to get the server running! You've earned a Premium-Slot for one month!
-            PlayerYell Thank you %p%! This is your %serverstarter_threshold_3%th time helping to get the server running! You earned a Premium-Slot for one month! :)
-            AdminSay [ServerStarter] %p% has been rewarded a premium slot for %serverstarter_duration_3% days (threshold %serverstarter_threshold_3%)
-            Log [ServerStarter] %p% reached %serverstarter_threshold_3% starts and was rewarded.
-    ElseIf %ini_vars_serverstarter_%p%% == %serverstarter_threshold_2%
-        If %ini_premiumslots_%p%% >= 0
-            Exec reservedSlotsList.add %p%
-            Set %ini_premiumslots_%p%% %ini_premiumslot_day% + %serverstarter_duration_2%
-            Exec reservedSlotsList.save
-            Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (%serverstarter_threshold_2% times) - Date: %ymd%
-            PlayerSay Thank you %p%! This is your %serverstarter_threshold_2%th time helping to get the server running! You've earned a Premium-Slot for 2 weeks!
-            PlayerYell Thank you %p%! This is your %serverstarter_threshold_2%th time helping to get the server running! You earned a Premium-Slot for 2 weeks! :)
-            AdminSay [ServerStarter] %p% has been rewarded a premium slot for %serverstarter_duration_2% days (threshold %serverstarter_threshold_2%)
-            Log [ServerStarter] %p% reached %serverstarter_threshold_2% starts and was rewarded.
-    ElseIf %ini_vars_serverstarter_%p%% == %serverstarter_threshold_1%
-        If %ini_premiumslots_%p%% >= 0
-            Exec reservedSlotsList.add %p%
-            Set %ini_premiumslots_%p%% %ini_premiumslot_day% + %serverstarter_duration_1%
-            Exec reservedSlotsList.save
-            Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (%serverstarter_threshold_1% times) - Date: %ymd%
-            PlayerSay Thank you %p%! This is your %serverstarter_threshold_1%th time helping to get the server running! You've earned a Premium-Slot for one week!
-            PlayerYell Thank you %p%! This is your %serverstarter_threshold_1%th time helping to get the server running! You earned a Premium-Slot for one week! :)
-            AdminSay [ServerStarter] %p% has been rewarded a premium slot for %serverstarter_duration_1% days (threshold %serverstarter_threshold_1%)
-            Log [ServerStarter] %p% reached %serverstarter_threshold_1% starts and was rewarded.
-
-# --- PLAYER PROGRESS CHECK COMMAND ---
-On Say; Text !serverstarter
-    PlayerSay %p%, you have started the server %ini_vars_serverstarter_%p%% times. Next rewards at: %serverstarter_threshold_1%, %serverstarter_threshold_2%, %serverstarter_threshold_3%, %serverstarter_threshold_4%.
-
-# --- OPTIONAL: RESET PROGRESS IF INACTIVE FOR 30 DAYS ---
-On Join
-    If %ini_vars_serverstarter_lastjoin_%p%% + 2592000 < %seconds%
-        Set %ini_vars_serverstarter_%p%% 0
-        PlayerSay %p%, your server starter progress was reset due to 30 days inactivity.
-    Set %ini_vars_serverstarter_lastjoin_%p%% %seconds%
+On Spawn; PlayerOnce; If %ts1% + %ts2% < 5; If %ini_vars_serverstarter_lastmsg_%p%% + 300 < %seconds%; PlayerSay %p%, thank you for starting the first round!; PlayerSay If you are able to start the first round successfully a few times, you will be rewarded with a Premium Slot!; PlayerYell If you are able to start the first round successfully a few times, you will be rewarded with a Premium-Slot!; Set %ini_vars_serverstarter_lastmsg_%p%% %seconds%
+On Spawn; PlayerOnce; If %ini_vars_serverstarter_%p%% == %serverstarter_threshold_4%; If %ini_premiumslots_%p%% >= 0; Exec reservedSlotsList.add %p%; Set %ini_premiumslots_%p%% %ini_premiumslot_day% + %serverstarter_duration_4%; Exec reservedSlotsList.save; Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (%serverstarter_threshold_4% times) - Date: %ymd%; PlayerSay Thank you %p%! This is your %serverstarter_threshold_4%th time helping to get the server running! You've earned another Premium-Slot for one month!; PlayerYell Thank you %p%! This is your %serverstarter_threshold_4%th time helping to get the server running! You earned another Premium-Slot for one month!; AdminSay [ServerStarter] %p% has been rewarded a premium slot for %serverstarter_duration_4% days (threshold %serverstarter_threshold_4%); Log [ServerStarter] %p% reached %serverstarter_threshold_4% starts and was rewarded.
+On Spawn; PlayerOnce; If %ini_vars_serverstarter_%p%% == %serverstarter_threshold_3%; If %ini_premiumslots_%p%% >= 0; Exec reservedSlotsList.add %p%; Set %ini_premiumslots_%p%% %ini_premiumslot_day% + %serverstarter_duration_3%; Exec reservedSlotsList.save; Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (%serverstarter_threshold_3% times) - Date: %ymd%; PlayerSay Thank you %p%! This is your %serverstarter_threshold_3%th time helping to get the server running! You've earned a Premium-Slot for one month!; PlayerYell Thank you %p%! This is your %serverstarter_threshold_3%th time helping to get the server running! You earned a Premium-Slot for one month! :); AdminSay [ServerStarter] %p% has been rewarded a premium slot for %serverstarter_duration_3% days (threshold %serverstarter_threshold_3%); Log [ServerStarter] %p% reached %serverstarter_threshold_3% starts and was rewarded.
+On Spawn; PlayerOnce; If %ini_vars_serverstarter_%p%% == %serverstarter_threshold_2%; If %ini_premiumslots_%p%% >= 0; Exec reservedSlotsList.add %p%; Set %ini_premiumslots_%p%% %ini_premiumslot_day% + %serverstarter_duration_2%; Exec reservedSlotsList.save; Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (%serverstarter_threshold_2% times) - Date: %ymd%; PlayerSay Thank you %p%! This is your %serverstarter_threshold_2%th time helping to get the server running! You've earned a Premium-Slot for 2 weeks!; PlayerYell Thank you %p%! This is your %serverstarter_threshold_2%th time helping to get the server running! You earned a Premium-Slot for 2 weeks! :); AdminSay [ServerStarter] %p% has been rewarded a premium slot for %serverstarter_duration_2% days (threshold %serverstarter_threshold_2%); Log [ServerStarter] %p% reached %serverstarter_threshold_2% starts and was rewarded.
+On Spawn; PlayerOnce; If %ini_vars_serverstarter_%p%% == %serverstarter_threshold_1%; If %ini_premiumslots_%p%% >= 0; Exec reservedSlotsList.add %p%; Set %ini_premiumslots_%p%% %ini_premiumslot_day% + %serverstarter_duration_1%; Exec reservedSlotsList.save; Set %ini_vars_PremiumSlot% Player: %p% - FewPlayers (%serverstarter_threshold_1% times) - Date: %ymd%; PlayerSay Thank you %p%! This is your %serverstarter_threshold_1%th time helping to get the server running! You've earned a Premium-Slot for one week!; PlayerYell Thank you %p%! This is your %serverstarter_threshold_1%th time helping to get the server running! You earned a Premium-Slot for one week! :); AdminSay [ServerStarter] %p% has been rewarded a premium slot for %serverstarter_duration_1% days (threshold %serverstarter_threshold_1%); Log [ServerStarter] %p% reached %serverstarter_threshold_1% starts and was rewarded.
+On Say; Text !serverstarter; PlayerSay %p%, you have started the server %ini_vars_serverstarter_%p%% times. Next rewards at: %serverstarter_threshold_1%, %serverstarter_threshold_2%, %serverstarter_threshold_3%, %serverstarter_threshold_4%.

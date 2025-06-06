@@ -7,67 +7,38 @@
 #####################################################
 
 # Reset all variables at round start
-On Round;
-    Set %server_m_player[1]% "";
-    Set %server_m_player[2]% "";
-    Set %server_m_player[3]% "";
-    Set %server_m_kills[1]% 0;
-    Set %server_m_kills[2]% 0;
-    Set %server_m_kills[3]% 0;
-    Set %server_m_report% 0;
-    Set %server_m_report_reason% "";
-    Set %server_m_killcount% 0;
+On Round; Set %server_m_player[1]% ""; Set %server_m_player[2]% ""; Set %server_m_player[3]% ""; Set %server_m_kills[1]% 0; Set %server_m_kills[2]% 0; Set %server_m_kills[3]% 0; Set %last_top1% ""; Set %last_top2% ""; Set %last_top3% ""; Set %server_m_report% 0; Set %server_m_report_reason% ""; Set %server_m_killcount% 0;
 
 # Increment player kill count
-On Kill;
-    Incr %m_kills%;
+On Kill; Incr %m_kills%;
 
-# Main logic for updating top 3
-On Kill;
-    # If player is already in top 3, update their kills
-    If %p% == %server_m_player[1]%; Set %server_m_kills[1]% %m_kills%;
-    If %p% == %server_m_player[2]%; Set %server_m_kills[2]% %m_kills%;
-    If %p% == %server_m_player[3]%; Set %server_m_kills[3]% %m_kills%;
+# Update kills if player is already in top 3
+On Kill; If %p% == %server_m_player[1]%; Set %server_m_kills[1]% %m_kills%;
+On Kill; If %p% == %server_m_player[2]%; Set %server_m_kills[2]% %m_kills%;
+On Kill; If %p% == %server_m_player[3]%; Set %server_m_kills[3]% %m_kills%;
 
-    # If player surpasses 1st place
-    If %m_kills% > %server_m_kills[3]%;
-        If %m_kills% <= %server_m_kills[2]%;
-        If %p% != %server_m_player[2]% && %p% != %server_m_player[1]%;
-            Set %server_m_player[3]% %p%;
-            Set %server_m_kills[3]% %m_kills%;
-            Set %server_m_report% 1;
-            Set %server_m_report_reason% "New #3";
+# Insert or reorder player in top 3 if needed
+On Kill; If %m_kills% > %server_m_kills[1]%; If %p% != %server_m_player[1]%; If %p% != %server_m_player[2]%; Set %server_m_player[3]% %server_m_player[2]%; Set %server_m_kills[3]% %server_m_kills[2]%; Set %server_m_player[2]% %server_m_player[1]%; Set %server_m_kills[2]% %server_m_kills[1]%; Set %server_m_report% 1; Set %server_m_report_reason% "New #1"; Set %server_m_player[1]% %p%; Set %server_m_kills[1]% %m_kills%;
+On Kill; If %m_kills% > %server_m_kills[1]%; If %p% != %server_m_player[1]%; If %p% == %server_m_player[2]%; Set %server_m_player[2]% %server_m_player[1]%; Set %server_m_kills[2]% %server_m_kills[1]%; Set %server_m_report% 1; Set %server_m_report_reason% "New #1"; Set %server_m_player[1]% %p%; Set %server_m_kills[1]% %m_kills%;
+On Kill; If %m_kills% > %server_m_kills[2]%; If %p% != %server_m_player[2]%; If %p% != %server_m_player[1]%; Set %server_m_player[3]% %server_m_player[2]%; Set %server_m_kills[3]% %server_m_kills[2]%; Set %server_m_report% 1; Set %server_m_report_reason% "New #2"; Set %server_m_player[2]% %p%; Set %server_m_kills[2]% %m_kills%;
+On Kill; If %m_kills% > %server_m_kills[3]%; If %p% != %server_m_player[3]%; If %p% != %server_m_player[1]%; If %p% != %server_m_player[2]%; Set %server_m_report% 1; Set %server_m_report_reason% "New #3"; Set %server_m_player[3]% %p%; Set %server_m_kills[3]% %m_kills%;
 
-    # Announce if someone leaves top 3 (only if changed)
-    If %server_m_player[1]% != %last_top1%;
-        If %last_top1% != ""; Set %server_m_report% 1; Set %server_m_report_reason% "%last_top1% left #1";
-    Set %last_top1% %server_m_player[1]%;
+# Prevent duplicate names in top 3
+On Kill; If %server_m_player[1]% == %server_m_player[2]%; Set %server_m_player[2]% "";
+On Kill; If %server_m_player[1]% == %server_m_player[3]%; Set %server_m_player[3]% "";
+On Kill; If %server_m_player[2]% == %server_m_player[3]%; Set %server_m_player[3]% "";
 
-    If %server_m_player[2]% != %last_top2%;
-        If %last_top2% != ""; Set %server_m_report% 1; Set %server_m_report_reason% "%last_top2% left #2";
-    Set %last_top2% %server_m_player[2]%;
+# Announce if someone leaves top 3 (only if changed)
+On Kill; If %server_m_player[1]% != %last_top1%; If %last_top1% != ""; Set %server_m_report% 1; Set %server_m_report_reason% "%last_top1% left #1";
+On Kill; If %server_m_player[1]% != %last_top1%; Set %last_top1% %server_m_player[1]%;
+On Kill; If %server_m_player[2]% != %last_top2%; If %last_top2% != ""; Set %server_m_report% 1; Set %server_m_report_reason% "%last_top2% left #2";
+On Kill; If %server_m_player[2]% != %last_top2%; Set %last_top2% %server_m_player[2]%;
+On Kill; If %server_m_player[3]% != %last_top3%; If %last_top3% != ""; Set %server_m_report% 1; Set %server_m_report_reason% "%last_top3% left #3";
+On Kill; If %server_m_player[3]% != %last_top3%; Set %last_top3% %server_m_player[3]%;
 
-    If %server_m_player[3]% != %last_top3%;
-        If %last_top3% != ""; Set %server_m_report% 1; Set %server_m_report_reason% "%last_top3% left #3";
-    Set %last_top3% %server_m_player[3]%;
-
-    # Prevent duplicate names in top 3 (enforce order, clear lower slots if duplicate)
-    If %server_m_player[1]% == %server_m_player[2]%; Set %server_m_player[2]% ""; Set %server_m_kills[2]% 0;
-    If %server_m_player[1]% == %server_m_player[3]%; Set %server_m_player[3]% ""; Set %server_m_kills[3]% 0;
-    If %server_m_player[2]% == %server_m_player[3]%; Set %server_m_player[3]% ""; Set %server_m_kills[3]% 0;
-
-# Periodic report every 25 kills
-On Kill;
-    Incr %server_m_killcount%;
-    If %server_m_killcount% >= 25;
-        Set %server_m_report% 1;
-        Set %server_m_report_reason% "------";
+# Periodic report every 70 kills
+On Kill; Incr %server_m_killcount%;
+On Kill; If %server_m_killcount% >= 70; Set %server_m_report% 1; Set %server_m_report_reason% "------";
 
 # Output report if needed
-On Kill;
-    If %server_m_report% == 1;
-        Say ----%server_m_report_reason%-------- Most kills by -----------------
-        Say [1st] %server_m_player[1]% %server_m_kills[1]%, [2nd] %server_m_player[2]% %server_m_kills[2]%, [3rd] %server_m_player[3]% %server_m_kills[3]%
-        Say Kill gap: [%server_m_kills[1]% - %server_m_kills[2]%] between 1st and 2nd
-        Set %server_m_report% 0;
-        Set %server_m_killcount% 0;
+On Kill; If %server_m_report% == 1; Say ----%server_m_report_reason%-------- Most kills by -----------------; Say [1st] %server_m_player[1]% %server_m_kills[1]%, [2nd] %server_m_player[2]% %server_m_kills[2]%, [3rd] %server_m_player[3]% %server_m_kills[3]%; Say Kill gap: [%server_m_kills[1]% - %server_m_kills[2]%] between 1st and 2nd; Set %server_m_report% 0; Set %server_m_killcount% 0;
