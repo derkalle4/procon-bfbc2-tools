@@ -5,22 +5,60 @@ About ProconRulz
 ----------------
 ProconRulz is a meta-plugin for Procon (Battlefield BC2/BF3) that allows admins to define flexible server rules using a simple scripting language. Rules react to game events (triggers), check conditions, and execute actions.
 
-Rule Syntax
------------
-A rule is structured as:
-On <Trigger>; <Condition(s)>; <Action(s)>
+Rule Syntax & Formatting (AI Addendum)
+--------------------------------------
+**Each rule must be a single line.**
+- No multi-line rules, no indentation, and no blocks.
+- No curly brackets, Python/JS-style blocks, or nested logic.
+- No comments or blank lines between rules (these are treated as rules and can cause parsing issues).
+- No variable keys with quotes or dictionary/array syntax. Use `%var[player_key]%` or `%var[player_key]_suffix%` instead of `%var[player]["key"]%`.
+- For per-player variables with multiple keys, use a naming convention like `%server_var[%p%_key]%` (e.g. `%server_squadenforcer_players[%p%_squad]%`).
+- All logic must be explicit and linear.
+- Each rule starts with a trigger and is separated by semicolons:  
+  `On <Trigger>; <Condition(s)>; <Action(s)>`
 
-- Triggers: On Round, On Spawn, On Kill, On TeamKill, On Suicide, On Join, On Leave, On Say
-- Conditions: Weapon <key>, Damage <key>, Kit <kit>, Map <name>, MapMode <mode>, PlayerCount <N>, Admin, Text <string>, TargetPlayer [<name>], If <var> <compare> <value>, etc.
-- Actions: Say <msg>, Yell <msg>, Kill [delay], Kick <msg>, Ban <msg>, TempBan <seconds> <msg>, TargetAction <action>, Exec <rcon command>, Set/Incr/Decr <var>, Log <msg>
+Triggers, Conditions, and Actions (Summary & Details)
+-----------------------------------------------------
+**Triggers**
+- On Round: %m% (map), %mm% (mode)
+- On Spawn: %p% (player), %pt% (team), %k% (kit), %w% (weapon), %spec% (specializations)
+- On Kill: %p% (killer), %v% (victim), %w% (weapon), %d% (damage)
+- On TeamKill: as above
+- On Suicide: %p%, %w%
+- On Join/Leave: %p%
+- On Say: %p%, %text%
+- On PluginLoaded: (for plugin reload logic)
+
+**Conditions** (prefix with "Not " to reverse)
+- Admin, Admins, Protected
+- Team <string>, Teamsize <N>
+- Map <string>, MapMode <string>
+- Headshot, Kit <kit> [<N>], Weapon <weapon> [<N>], Damage <damage> [<N>], Spec <specialization> [<N>]
+- TeamKit/TeamWeapon/TeamDamage/TeamSpec <key> <N>
+- Range <N>
+- PlayerCount/Count <N>, TeamCount <N>, ServerCount <N>
+- Rate <N> <M>, PlayerFirst, TeamFirst, ServerFirst, PlayerOnce
+- Text <key>, TargetPlayer [<name>], Ping <N>
+- Set/Incr/Decr/If <%varname%> <compare> <value>
+- Multiple conditions are separated by semicolons.
+
+**Actions**
+- Say, PlayerSay, SquadSay, TeamSay, VictimSay, AdminSay
+- Yell, PlayerYell, SquadYell, TeamYell
+- Log, Both, All
+- Kill [<N>], Kick, Ban, TempBan <N>, PBKick [<N>], PBBan
+- TargetAction <action>, Exec <command>
+- Set/Incr/Decr <var>, End
 
 Variables
 ---------
 - Substitution variables: %p% (player), %v% (victim), %w% (weapon), %d% (damage), %c% (player rule count), %tc% (team rule count), %sc% (server rule count), %t% (target player), %text%, %targettext%, %team_score%, etc.
 - Rulz variables: Custom, e.g. %kills%, %server_kills%, %team_kills%, can be indexed: %server_tked[%p%]%
 - Persistent variables: %ini_<section>_<var>% (stored in INI file, not reset per round)
+- Indexed variables: Use `%var[index]%` for per-player or per-team data. For multiple indices, concatenate with underscores or similar, e.g., `%var[%p%_squad]%`.
+- No support for dictionary/array syntax like `%var[%p%]["key"]%`. Use `%var[%p%_key]%` instead.
 
-Multi-line Rules
+Multi-line Rules (NOT SUPPORTED in AI output)
 ----------------
 - Omit trigger to inherit from above (trigger propagation).
 - Use `+` at line start to continue previous rule (lines joined into one rule).
@@ -47,36 +85,6 @@ Arithmetic & Rounding
 - Use +, -, *, / in Set and If (no parentheses).
 - Example: Set %x% %y% + %z%
 - Use %var.3% for 3 decimal places (e.g. Set %x.3% 1.4567;Say %x.3% outputs "1.457").
-
-Triggers, Conditions, and Actions (Summary & Details)
------------------------------------------------------
-**Triggers**
-- On Round: %m% (map), %mm% (mode)
-- On Spawn: %p% (player), %pt% (team), %k% (kit), %w% (weapon), %spec% (specializations)
-- On Kill: %p% (killer), %v% (victim), %w% (weapon), %d% (damage)
-- On TeamKill: as above
-- On Suicide: %p%, %w%
-- On Join/Leave: %p%
-- On Say: %p%, %text%
-
-**Conditions** (prefix with "Not " to reverse)
-- Admin, Admins, Protected
-- Team <string>, Teamsize <N>
-- Map <string>, MapMode <string>
-- Headshot, Kit <kit> [<N>], Weapon <weapon> [<N>], Damage <damage> [<N>], Spec <specialization> [<N>]
-- TeamKit/TeamWeapon/TeamDamage/TeamSpec <key> <N>
-- Range <N>
-- PlayerCount/Count <N>, TeamCount <N>, ServerCount <N>
-- Rate <N> <M>, PlayerFirst, TeamFirst, ServerFirst, PlayerOnce
-- Text <key>, TargetPlayer [<name>], Ping <N>
-- Set/Incr/Decr/If <%varname%> <compare> <value>
-
-**Actions**
-- Say, PlayerSay, SquadSay, TeamSay, VictimSay, AdminSay
-- Yell, PlayerYell, SquadYell, TeamYell
-- Log, Both, All
-- Kill [<N>], Kick, Ban, TempBan <N>, PBKick [<N>], PBBan
-- TargetAction <action>, Exec <command>
 
 Substitution Variables (Appendix 1)
 -----------------------------------
@@ -160,5 +168,16 @@ Glossary
 - substitution variable: Built-in variable replaced with game data, e.g. %p%.
 - trigger: Event that causes a rule to be evaluated, e.g. On Kill.
 - Weapon: The tool used to kill/damage, e.g. SMAW.
+
+AI Addendum: Best Practices for ProconRulz Scripting
+----------------------------------------------------
+- Each rule must be a single line, no indentation, no comments between rules.
+- Use explicit triggers, conditions, and actions for every rule.
+- Use only supported variable syntax: `%var[index]%` or `%var%`, not `%var["key"]%`.
+- For per-player multi-key variables, use `%var[%p%_key]%` (e.g. `%server_squadenforcer_players[%p%_squad]%`).
+- All logic must be explicit and split into separate rules.
+- Avoid blank lines and comments between rules in your .txt files.
+- If you want to reset all per-player variables at round start, use a custom reset flag or explicit resets for each relevant variable.
+- If you want to support more commands or features, follow the above structure for compatibility.
 
 For full lists of weapons, kits, and more, see the ProconRulz plugin ‘Details’ tab.
