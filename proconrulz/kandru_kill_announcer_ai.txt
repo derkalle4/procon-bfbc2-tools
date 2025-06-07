@@ -15,10 +15,10 @@ On Kill; PlayerOnce; If %c% == 3; Yell TRIPLE KILL! %p% is unstoppable!
 On Kill; PlayerOnce; If %c% == 4; Yell QUADRA KILL! %p% is a machine!
 On Kill; PlayerOnce; If %c% == 5; Yell PENTA KILL! %p% is a legend!
 
-On Kill; ServerFirst; Yell %pt% %p% drew FIRST BLOOD by killing %v% with %w%!
+On Kill; ServerFirst; Yell %p% drew FIRST BLOOD by killing %v% with %w%!
 
 On Kill; Set %server_lastkiller[%v%]% %p%
-On Kill; If %v% == %server_lastkiller[%p%]%; Yell %p% got REVENGE on %v%!
+On Kill; If %v% == %server_lastkiller[%p%]%; Say %p% got REVENGE on %v%!
 
 On Kill; If %ini_killstreak_%p%% == 0; Set %ini_killstreak_%p%% 1
 On Kill; If %ini_killstreak_%p%% > 0; Incr %ini_killstreak_%p%%

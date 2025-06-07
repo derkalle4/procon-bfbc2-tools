@@ -3,6 +3,6 @@ On Kill;Weapon knv-1;Say %p% grabbed and stabbed %v%
 On Kill;If %wk% contains Defib;Say %p% zapped %v% with the Defib
 On Kill;If %wk% contains Repair;Say %p% killed %v% with the Repair Tool
 # FIRSTBLOOD
-On Kill;ServerFirst;Say %pt% %p% has FIRST BLOOD by killing %v% with %w%
+On Kill;ServerFirst;Say %p% has FIRST BLOOD by killing %v% with %w%
 # range kill
 On Kill;%h%;Range 100;Say %p% just killed %v% over more than %r% meters!
