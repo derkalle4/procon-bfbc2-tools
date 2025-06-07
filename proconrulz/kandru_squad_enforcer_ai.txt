@@ -6,7 +6,7 @@
 ## - On plugin reload during round: disables enforcement until next map
 #######################################
 
-On Init; Say Squad Enforcer initialized.
+On Init; Say SQUAD enforcer by kandru initialized
 
 On Round; Set %server_squadenforcer_players_reset% 1
 On Round; Set %server_squadenforcer_squads[1][1]% 0
