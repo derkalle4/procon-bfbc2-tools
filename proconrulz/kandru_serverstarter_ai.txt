@@ -8,7 +8,7 @@ On Init;Set %ini_vars_serverstarter_duration_1% 7
 On Init;Set %ini_vars_serverstarter_duration_2% 14
 On Init;Set %ini_vars_serverstarter_duration_3% 30
 On Init;Set %ini_vars_serverstarter_duration_4% 30
-On Init;Say !serverstarter by kandru initialized %ini_vars_serverstarter_threshold_1%
+On Init;Say !serverstarter by kandru initialized
 
 On Join; If %ts1% + %ts2% < 5; Incr %ini_vars_serverstarter_%p%%
 On Join; If %ini_vars_serverstarter_lastjoin_%p%% + 2592000 < %seconds%; Set %ini_vars_serverstarter_%p%% 0; PlayerSay %p%, your server starter progress was reset due to 30 days inactivity.
