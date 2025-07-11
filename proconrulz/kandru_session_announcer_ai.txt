@@ -1,6 +1,5 @@
 On Join;Say %p% joined us :)
 On Leave;Say %p% left us :/
-On Join;Admin;Say Admin %p% has joined the server!
 On Join;Incr %ini_vars_session_joins_%p%%
 
 On Spawn;PlayerOnce;If %ini_vars_session_joins_%p%% == 1;PlayerSay Welcome %p%! Play fair and have fun!
